@@ -1,0 +1,38 @@
+# Visual Studio cache and user-specific files
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# User-specific files
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Local environment variables
+.env
+.env.local
+appsettings.Development.json
