@@ -3,7 +3,8 @@ using Ecommerce.Application.IService.IAuthServices;
 using Ecommerce.domain.Model.authModel;
 using Ecommerce.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens.Experimental;
+using Microsoft.EntityFrameworkCore;
+
 using System.Security.Claims;
 
 namespace Ecommerce.Application.Services
@@ -67,16 +68,18 @@ namespace Ecommerce.Application.Services
 			};
 		}
 
-		public async Task<AuthResponse> RefreshToken(string refreshToken)
+		public async Task<AuthResponse> RefreshToken(TokenRequest token)
 		{
-			var principal = _tokenService.GetPrincipalFromExpiredToken(refreshToken);
+			var principal = _tokenService.GetPrincipalFromExpiredToken(token.AccessToken);
 			var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-			var user = await _userManager.FindByIdAsync(userId);
+			var user = await _userManager.Users
+										 .Include(u => u.RefreshTokens)
+										 .FirstOrDefaultAsync(u => u.Id == userId);
 			if (user == null)
 			{
 				throw new Exception("Invalid refresh token");
 			}
-			var storedToken = user.RefreshTokens.FirstOrDefault(t => t.Token == refreshToken);
+			var storedToken = user.RefreshTokens.FirstOrDefault(t => t.Token == token.RefreshToken);
 			if (storedToken == null || storedToken.IsRevoked || storedToken.Expires < DateTime.UtcNow)
 			{
 				throw new Exception("Invalid refresh token");
@@ -88,11 +91,11 @@ namespace Ecommerce.Application.Services
 							   user.Email,
 							   roles
 						   );
-			var refereshtoken = _tokenService.GenerateRefreshToken();
+			var newRefreshToken = _tokenService.GenerateRefreshToken();
 
 			user.RefreshTokens.Add(new RefreshToken
 			{
-				Token = _tokenService.GenerateRefreshToken(),
+				Token = newRefreshToken,
 				Expires = DateTime.UtcNow.AddDays(7),
 				IsRevoked = false,
 				UserId = user.Id,
@@ -102,8 +105,26 @@ namespace Ecommerce.Application.Services
 			return new AuthResponse
 			{
 				AccessToken = newAccessToken,
-				RefreshToken = refereshtoken
+				RefreshToken = newRefreshToken
 			};
+		}
+
+		public async Task RevokeToken(LogoutDto dto)
+		{
+			var user = await _userManager.Users
+	   .Include(u => u.RefreshTokens)
+	   .FirstOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == dto.token));
+
+			if (user == null) return;
+
+			var token = user.RefreshTokens
+				.SingleOrDefault(t => t.Token == dto.token);
+
+			if (token == null || token.IsRevoked) return;
+
+			token.IsRevoked = true;
+
+			await _userManager.UpdateAsync(user);
 		}
 	}
 }

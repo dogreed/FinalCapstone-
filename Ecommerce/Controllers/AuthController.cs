@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Application.Dtos.AuthDtos;
 using Ecommerce.Application.IService.IAuthServices;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Controllers
@@ -30,11 +31,19 @@ namespace Ecommerce.Controllers
 			return Ok(response);
 		}
 		[HttpPost("ref")]
-		public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+		public async Task<IActionResult> RefreshToken( TokenRequest request)
 		{
-			var response = await _authService.RefreshToken(refreshToken);
+			var response = await _authService.RefreshToken(request);
 			return Ok(response);
 
+		}
+
+		[HttpPost("logout")]
+		[Authorize]
+		public async Task<IActionResult> Logout(LogoutDto dto)
+		{
+			await _authService.RevokeToken(dto);
+			return Ok(new { Message = "Log ou Sucesfully" });
 		}
 	}
 }

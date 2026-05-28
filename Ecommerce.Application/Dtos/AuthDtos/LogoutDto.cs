@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Dtos.AuthDtos
 {
-	public class TokenRequest
+	public class LogoutDto
 	{
-		public string AccessToken { get; set; }
-		public string RefreshToken { get; set; }
+		public string token { get; set; }
 	}
 }

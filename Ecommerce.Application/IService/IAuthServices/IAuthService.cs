@@ -11,6 +11,7 @@ namespace Ecommerce.Application.IService.IAuthServices
 	{
 		Task Register(RegisterRequest request);
 		Task<AuthResponse> Login(LoginDto request);
-		Task<AuthResponse> RefreshToken(string refreshToken);
+		Task<AuthResponse> RefreshToken(TokenRequest token);
+		Task RevokeToken(LogoutDto dto);
 	}
 }
