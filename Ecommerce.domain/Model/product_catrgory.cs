@@ -9,7 +9,7 @@ namespace Ecommerce.domain.Model
 {
 	public class product_catrgory
 	{
-		public int categoryIdid { get; set; }
+		public int id { get; set; }
 		[Required (ErrorMessage = "Category Name is Required")]
 		public string Name { get; set; } = string.Empty;
 		public string? Description { get; set; }
