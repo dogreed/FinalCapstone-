@@ -13,5 +13,6 @@ namespace Ecommerce.Application.IService.IAuthServices
 		Task<AuthResponse> Login(LoginDto request);
 		Task<AuthResponse> RefreshToken(TokenRequest token);
 		Task RevokeToken(LogoutDto dto);
+		Task<bool> confirmEmail(string userId, string token);
 	}
 }

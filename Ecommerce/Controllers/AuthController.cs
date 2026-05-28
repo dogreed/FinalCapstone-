@@ -31,7 +31,7 @@ namespace Ecommerce.Controllers
 			return Ok(response);
 		}
 		[HttpPost("ref")]
-		public async Task<IActionResult> RefreshToken( TokenRequest request)
+		public async Task<IActionResult> RefreshToken(TokenRequest request)
 		{
 			var response = await _authService.RefreshToken(request);
 			return Ok(response);
@@ -44,6 +44,19 @@ namespace Ecommerce.Controllers
 		{
 			await _authService.RevokeToken(dto);
 			return Ok(new { Message = "Log ou Sucesfully" });
+		}
+		[HttpGet("ConfirmEmail")]
+		public async Task<IActionResult> ConfirmEmail(string userId, string token)
+		{
+			var result = await _authService.confirmEmail(userId, token);
+			if (result)
+			{
+				return Ok(new { Message = "Email confirmed successfully" });
+			}
+			else
+			{
+				return BadRequest(new { Message = "Invalid token or user ID" });
+			}
 		}
 	}
 }

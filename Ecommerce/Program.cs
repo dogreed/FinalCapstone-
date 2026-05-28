@@ -1,9 +1,12 @@
 using Ecommerce;
+using Ecommerce.Application.Dtos.AuthDtos;
 using Ecommerce.Application.IService.IAuthServices;
 using Ecommerce.Application.Services;
+using Ecommerce.Infrastructure.Backgrounds;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +60,16 @@ builder.Services.AddAuthentication(options =>
 		ClockSkew = TimeSpan.Zero
 	};
 });
+//Email Configure
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSetting"));
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+//
+builder.Services.AddScoped<EmailConfirmation>();
+//HangFire
+builder.Services.AddHangfire(config => config.UseSqlServerStorage(connectionString));
+builder.Services.AddHangfireServer();
+//
 
 builder.Services.AddScoped<IAuthService, AuthServices>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -72,7 +85,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
+app.UseHangfireDashboard("/hangfire");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

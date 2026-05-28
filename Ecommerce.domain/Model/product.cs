@@ -16,7 +16,7 @@ namespace Ecommerce.domain.Model
 		public string SKU { get; set; } = string.Empty;
 		public int categoryId { get; set; }
 		public int inventoryId { get; set; }
-		public int discountId { get; set; }
+		
 
 		public DateTime Created_at { get; set; } = DateTime.Now;
 		public DateTime? Updated_at { get; set; }
